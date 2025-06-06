@@ -139,6 +139,9 @@ public:
         , id_(shared_count_id)
 #endif
     {
+        // special-case code for null pointers added at CCDC:
+        if ( !p )
+            return;
 #ifndef BOOST_NO_EXCEPTIONS
 
         try

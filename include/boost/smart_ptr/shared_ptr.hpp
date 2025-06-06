@@ -35,6 +35,8 @@
 #include <memory>               // for std::auto_ptr
 #include <iosfwd>               // for std::basic_ostream
 
+#include <ostream>              // for shared_ptr::print() - added at CCDC
+
 #if defined( BOOST_SP_DISABLE_DEPRECATED )
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -241,6 +243,17 @@ struct sp_internal_constructor_tag
 
 } // namespace detail
 
+
+// Added at CCDC
+template< typename DummyType >
+class HandleCommon
+{
+public:
+    static void null_handle_error()
+    {
+        throw std::runtime_error( "Internal error: access of null handle" );
+    }
+};
 
 //
 //  shared_ptr
@@ -539,21 +552,27 @@ public:
         this_type( static_cast< shared_ptr<Y> && >( r ), p ).swap( *this );
     }
 
-    typename boost::detail::sp_dereference< T >::type operator* () const BOOST_SP_NOEXCEPT_WITH_ASSERT
+    typename boost::detail::sp_dereference< T >::type operator* () const // Modified at CCDC to throw std::runtime_error for null pointers
     {
-        BOOST_ASSERT( px != 0 );
+        //BOOST_ASSERT( px != 0 );
+        if ( px == 0 )
+            HandleCommon<int>::null_handle_error();
         return *px;
     }
     
-    typename boost::detail::sp_member_access< T >::type operator-> () const BOOST_SP_NOEXCEPT_WITH_ASSERT
+    typename boost::detail::sp_member_access< T >::type operator-> () const // Modified at CCDC to throw std::runtime_error for null pointers
     {
-        BOOST_ASSERT( px != 0 );
+        //BOOST_ASSERT( px != 0 );
+        if ( px == 0 )
+            HandleCommon<int>::null_handle_error();
         return px;
     }
     
-    typename boost::detail::sp_array_access< T >::type operator[] ( std::ptrdiff_t i ) const BOOST_SP_NOEXCEPT_WITH_ASSERT
+    typename boost::detail::sp_array_access< T >::type operator[] ( std::ptrdiff_t i ) const  // Modified at CCDC to throw std::runtime_error for null pointers
     {
-        BOOST_ASSERT( px != 0 );
+        //BOOST_ASSERT( px != 0 );
+        if ( px == 0 )
+            HandleCommon<int>::null_handle_error();
         BOOST_ASSERT( i >= 0 && ( i < boost::detail::sp_extent< T >::value || boost::detail::sp_extent< T >::value == 0 ) );
 
         return static_cast< typename boost::detail::sp_array_access< T >::type >( px[ i ] );
@@ -633,6 +652,16 @@ public:
     boost::detail::shared_count _internal_count() const noexcept
     {
         return pn;
+    }
+
+    // Added at CCDC
+    std::ostream& print(std::ostream& os) const
+    {
+        if ( px == 0 )
+            os << "<zero handle>";
+        else
+            os << *px;
+        return os;
     }
 
 private:
@@ -777,8 +806,9 @@ template<class T> inline typename shared_ptr<T>::element_type * get_pointer(shar
 
 template<class E, class T, class Y> std::basic_ostream<E, T> & operator<< (std::basic_ostream<E, T> & os, shared_ptr<Y> const & p)
 {
-    os << p.get();
-    return os;
+    // Changed at CCDC to print out the object that is pointed to:
+    //os << p.get();
+    return p.print(os);
 }
 
 // get_deleter
