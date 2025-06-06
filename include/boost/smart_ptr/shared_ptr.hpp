@@ -250,9 +250,15 @@ template< typename DummyType >
 class HandleCommon
 {
 public:
-    static void null_handle_error()
+    class NullHandleError : public std::runtime_error
     {
-        throw std::runtime_error( "Internal error: access of null handle" );
+    public:
+        NullHandleError(const std::string& msg) : std::runtime_error(msg) {}
+    };
+
+    static void null_handle_error(const std::type_info& t)
+    {
+        throw NullHandleError( std::string("Internal error: access of null handle ") + t.name() );
     }
 };
 
@@ -557,7 +563,7 @@ public:
     {
         //BOOST_ASSERT( px != 0 );
         if ( px == 0 )
-            HandleCommon<int>::null_handle_error();
+            HandleCommon<int>::null_handle_error(typeid(T));
         return *px;
     }
     
@@ -565,7 +571,7 @@ public:
     {
         //BOOST_ASSERT( px != 0 );
         if ( px == 0 )
-            HandleCommon<int>::null_handle_error();
+            HandleCommon<int>::null_handle_error(typeid(T));
         return px;
     }
     
@@ -573,7 +579,7 @@ public:
     {
         //BOOST_ASSERT( px != 0 );
         if ( px == 0 )
-            HandleCommon<int>::null_handle_error();
+            HandleCommon<int>::null_handle_error(typeid(T));
         BOOST_ASSERT( i >= 0 && ( i < boost::detail::sp_extent< T >::value || boost::detail::sp_extent< T >::value == 0 ) );
 
         return static_cast< typename boost::detail::sp_array_access< T >::type >( px[ i ] );
