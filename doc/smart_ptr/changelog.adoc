@@ -1,5 +1,5 @@
 ////
-Copyright 2019, 2020 Peter Dimov
+Copyright 2019-2025 Peter Dimov
 
 Distributed under the Boost Software License, Version 1.0.
 
@@ -12,6 +12,24 @@ http://www.boost.org/LICENSE_1_0.txt
 :toc:
 :toc-title:
 :idprefix: changelog_
+
+## Changes in 1.88.0
+
+* Fix `operator<<` for wide streams (accidentally broken in 1.87.0)
+
+## Changes in 1.87.0
+
+* {cpp}03 is no longer supported, a {cpp}11 compiler is required.
+  This includes GCC 4.8 or later, and MSVC 14.0 or later.
+* The functionality enabled by the macros `BOOST_SP_ENABLE_DEBUG_HOOKS`,
+  `BOOST_SP_USE_STD_ALLOCATOR`, `BOOST_SP_USE_QUICK_ALLOCATOR`,
+  `BOOST_AC_USE_SPINLOCK`, `BOOST_AC_USE_PTHREADS`, `BOOST_SP_USE_SPINLOCK`,
+  and `BOOST_SP_USE_PTHREADS` has been deprecated and support for it
+  will be removed in a future release.
+
+## Changes in 1.79.0
+
+* Added `get_allocator_pointer`
 
 ## Changes in 1.74.0
 
