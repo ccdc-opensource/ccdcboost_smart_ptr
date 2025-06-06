@@ -35,6 +35,7 @@
 #include <memory>               // for std::auto_ptr
 #include <iosfwd>               // for std::basic_ostream
 
+#include <stdexcept>            // for std::runtime_error - added at CCDC
 #include <ostream>              // for shared_ptr::print() - added at CCDC
 
 #if defined( BOOST_SP_DISABLE_DEPRECATED )
